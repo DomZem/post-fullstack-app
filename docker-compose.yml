@@ -1,0 +1,44 @@
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'secret'
+      POSTGRES_DB: 'post'
+    ports:
+      - '5432:5432'
+    networks:
+      - post-network
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+  nest-backend:
+    build: ./nest-backend
+    container_name: nest-backend
+    environment:
+      DATABASE_URL: 'postgresql://user:secret@postgres-db:5432/post?schema=public'
+      FRONTEND_URL: 'http://localhost:8080'
+    ports:
+      - '3000:3000'
+    networks:
+      - post-network
+    depends_on:
+      - postgres-db
+  next-frontend:
+    build: ./next-frontend
+    container_name: next-frontend
+    environment:
+      NEXT_PUBLIC_BACKEND_API_URL: 'http://localhost:3000'
+      BACKEND_API_URL: 'http://nest-backend:3000'
+    ports:
+      - '8080:8080'
+    networks:
+      - post-network
+    depends_on:
+      - nest-backend
+
+networks:
+  post-network:
+
+volumes:
+  postgres-db:
