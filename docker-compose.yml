@@ -10,6 +10,8 @@ services:
       - '5432:5432'
     networks:
       - post-network
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
   nest-backend:
     build: ./nest-backend
     container_name: nest-backend
@@ -24,3 +26,6 @@ services:
 
 networks:
   post-network:
+
+volumes:
+  postgres-db:
